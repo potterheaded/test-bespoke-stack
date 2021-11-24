@@ -1,0 +1,40 @@
+name: Stack Initialize
+on:
+  workflow_dispatch:
+    inputs:
+      customer_name:
+        description: Name of customer this repository is for.
+        required: true
+
+      init_engagements:
+        description: Whether to initialize engagements.
+        required: false
+        default: "no"
+
+      debug:
+        description: Whether to display debug information.
+        required: false
+        default: "no"
+
+jobs:
+  dump_info:
+    name: Dump workflow information
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.debug == 'yes' }}
+    steps:
+      - name: Event info
+        run: |
+          jq '.' ${{ github.event_path }}
+
+  init_engagements:
+    name: Initialize engagement(s)
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.init_engagements == 'yes' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Populate project(s)
+        uses: ./.github/actions/populate_project
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
